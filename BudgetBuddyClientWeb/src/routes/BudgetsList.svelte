@@ -1,52 +1,39 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { getPeriodBudgets, periodBudgets, periodBudgetLabels } from '../controllers/periodBudgetController';
-	import type { PeriodBudget } from '../types/periodBudget';
+	import { getPeriodBudgets, periodBudgets, periodBudgetLabels, addPeriodBudget } from '../controllers/periodBudgetController';
+	import { PeriodBudget } from '../types/periodBudget';
 	import { error } from '@sveltejs/kit';
 
-    //let budgetsPromise: Promise<PeriodBudget[]> = getPeriodBudgets();
-
-	onMount(async () => {
-		const headers: Headers = new Headers();
-
-		headers.set('Content-Type', 'application/json');
-		headers.set('Accept', 'application/json');
-
-		const request: RequestInfo = new Request('http://localhost:8080/budgets', {
-			//method: 'GET',
-			//mode: 'cors',
-			headers: headers
-		});
-
+	async function setBudgetLabels() {
 		try {
-			const response = await fetch(request);
-			
-			// Check if the response is okay
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const data = await response.json();
-			console.log({ data });
-			periodBudgets.set(data);
+			const response = await getPeriodBudgets();
+			periodBudgets.set(response);
 		} catch (error) {
 			console.error('Fetch error:', error);
 			return [];
 		}
+	}	
 
-		// return fetch(request)
-		// .then(response => response.json())
-		// .then(data => {
-		// 	console.log({data});
-		// }).catch(error => {
-		// 	console.log({error});
-		// 	return [];
-		// });
-	});
+	onMount(async() => {
+		await setBudgetLabels();
+	})
+
+	let showAddBudgetDialog = false;
+
+	let newPeriodBudget: PeriodBudget = new PeriodBudget();
+
+	async function addNewBudget() {
+		console.log(await addPeriodBudget(newPeriodBudget));
+
+		showAddBudgetDialog = false;
+
+		await setBudgetLabels();
+	}
 </script>
 
 <div class="counter">
+	<div>
         {#each $periodBudgetLabels as name }
             <nav>
                 <ul>
@@ -56,6 +43,14 @@
                 </ul>
             </nav>       
         {/each}
+	</div>
+	<button on:click={() => {showAddBudgetDialog = true;}}>Add New Budget</button>
+	{#if showAddBudgetDialog}
+		<input bind:value={newPeriodBudget.Name}  placeholder="Budget Name"/>
+		<input bind:value={newPeriodBudget.StartDate} type="date"/>
+		<input bind:value={newPeriodBudget.EndDate} type="date"/>
+		<button on:click={addNewBudget}>Submit</button>
+	{/if}
 </div>
 
 <style>

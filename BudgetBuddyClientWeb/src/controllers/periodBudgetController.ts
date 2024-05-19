@@ -22,9 +22,24 @@ export async function getPeriodBudgets(): Promise<PeriodBudget[]> {
         headers: headers
     });
 
-    return fetch(request)
+    return await fetch(request)
         .then(res => res.json())
         .then(res => {
             return res as PeriodBudget[]
         });
+}
+
+export async function addPeriodBudget(budget: PeriodBudget) {
+    const headers: Headers = new Headers();
+
+    headers.set('Content-Type', 'application/json');
+    headers.set('Accept', 'application/json');
+
+    const request: RequestInfo = new Request('http://localhost:8080/budget', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(budget)
+    });
+
+    return await fetch(request).then(res => res);
 }
