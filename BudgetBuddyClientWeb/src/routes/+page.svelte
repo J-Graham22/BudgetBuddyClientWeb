@@ -2,6 +2,7 @@
 	import Counter from './Counter.svelte';
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
+	import BudgetsList from './BudgetsList.svelte';
 </script>
 
 <svelte:head>
@@ -26,6 +27,9 @@
 	</h2>
 
 	<Counter />
+
+	<h1>Budgets</h1>
+	<BudgetsList />
 </section>
 
 <style>
